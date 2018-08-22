@@ -11,12 +11,28 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @sort = params[:sort]
+    @all_ratings = Movie.all_ratings
+
+    #assign from the passed params
+    @sort = params[:sort] if params[:sort]
+    @ratings_shown = params[:ratings].keys if params[:ratings]
+    
+    #else assign from the session
+    @sort ||= session[:sort]
+    @ratings_shown ||= session[:ratings_shown]
+
+    #show all if neither passed from session nor params
+    @ratings_shown ||= @all_ratings
+
     if @sort
-      @movies = Movie.order( @sort => :asc) #looks ripe for sql injection but idk
+      @movies = Movie.where(rating: @ratings_shown).order( @sort => :asc) #looks ripe for sql injection but idk
     else
-      @movies = Movie.all
+      @movies = Movie.where(rating: @ratings_shown).all
     end
+
+    session[:ratings_shown] = @ratings_shown
+    session[:sort] = @sort
+    
   end
 
   def new
