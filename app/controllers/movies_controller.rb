@@ -11,7 +11,12 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @sort = params[:sort]
+    if @sort
+      @movies = Movie.order( @sort => :asc) #looks ripe for sql injection but idk
+    else
+      @movies = Movie.all
+    end
   end
 
   def new
